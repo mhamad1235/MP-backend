@@ -9,8 +9,5 @@ use Illuminate\Http\Response;
 
 class UserController extends Controller
 {
-    public function test(){
-        $user=Auth::user();
-        return $this->jsonResponse(true, $message="data", Response::HTTP_OK, $user);
-    }
+ 
 }
