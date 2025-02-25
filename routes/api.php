@@ -33,11 +33,9 @@ Route::post('/email/verification-notification', function (Request $request) {
     return response()->json(['message' => 'Verification email sent']);
 })->name('verification.send');
 
-// Verify email
 Route::get('/email/verify/{id}/{hash}', function ($id, $hash, Request $request) {
     $user = User::findOrFail($id);
 
-    // Check if the hash matches
     if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
         return response()->json(['message' => 'Invalid verification link'], 400);
     }
