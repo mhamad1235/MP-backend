@@ -3,38 +3,86 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Http\Response;
-use App\Http\Requests\LoginRequest;
 
 class LoginController extends Controller
 {
-    public function login(LoginRequest $request){
-        try {
-        $validated = $request->validated();
-        if ($validated["credential_type"] == 'email') {
-            $user = User::where('email', $validated["email_or_phone"])->first();
-        } else {
-            $user = User::where('phone', $validated["email_or_phone"])->first();
-        }
-        if (!$user || !Hash::check($validated['password'], $user->password)) {
-            return $this->jsonResponse(false,"Wrong password or email", Response::HTTP_UNAUTHORIZED);
-        }
-        if(!$user->hasVerifiedEmail()){
-            return $this->jsonResponse(false,"Please Verify Your email", Response::HTTP_UNAUTHORIZED);
-        }
-        $token = $user->createToken('auth_token')->plainTextToken;
-        $user["user_token"] = $token;
-        return $this->jsonResponse(true,"successful", Response::HTTP_OK, $user);
-    } catch (\Throwable $th) {
-        return response()->json([
-            "success" => false,
-            "message" => "An error occurred",
-            "error" => $th->getMessage()
-        ], Response::HTTP_INTERNAL_SERVER_ERROR);
-    }
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | Login Controller
+    |--------------------------------------------------------------------------
+    |
+    | This controller handles authenticating users for the application and
+    | redirecting them to your home screen. The controller uses a trait
+    | to conveniently provide its functionality to your applications.
+    |
+    */
 
+    use AuthenticatesUsers;
+
+    /**
+     * Where to redirect users after login.
+     *
+     * @var string
+     */
+    protected $redirectTo = '/home';
+
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+    }
+    public function login(Request $request)
+    {
+        $request->validate([
+            $this->username() => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        // If the class is using the ThrottlesLogins trait, we can automatically throttle
+        // the login attempts for this application. We'll key this by the username and
+        // the IP address of the client making these requests into this application.
+        if (
+            method_exists($this, 'hasTooManyLoginAttempts') &&
+            $this->hasTooManyLoginAttempts($request)
+        ) {
+            $this->fireLockoutEvent($request);
+            return $this->sendLockoutResponse($request);
+        }
+
+        $user = User::where($this->username(), $request->{$this->username()})->first();
+        
+        if (!$user || Hash::check($request->password, $user->password) == false) {
+            $message = 'auth.failed';
+            // If the login attempt was unsuccessful we will increment the number of attempts
+            // to login and redirect the user back to the login form. Of course, when this
+            // user surpasses their maximum number of attempts they will get locked out.
+            $this->incrementLoginAttempts($request);
+
+            throw ValidationException::withMessages([
+                $this->username() => [trans($message)],
+            ]);
+        }
+
+        if ($user->hasRole('user') || $user->roles->isEmpty()) {
+            $message = "Unauthorized, You are not allowed to login.";
+
+            $this->incrementLoginAttempts($request);
+
+            throw ValidationException::withMessages([
+                $this->username() => [trans($message)],
+            ]);
+        }
+
+        auth()->login($user);
+
+        return redirect()->intended($this->redirectTo);
+    }
 }

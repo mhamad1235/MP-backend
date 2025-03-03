@@ -11,13 +11,14 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Config;
 use App\Models\User;
 use App\Mail\VerifyEmail;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
         try {
-              
+
             $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
@@ -36,12 +37,12 @@ class AuthController extends Controller
                 ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
             );
 
-         
+
             Mail::to($user->email)->send(new VerifyEmail($user, $verificationUrl));
-          
+
             return response()->json([
                 'message' => 'User registered. Please check your email for verification.',
-                'verification_url' => $verificationUrl  // Optional: For debugging purposes
+                'verification_url' => $verificationUrl
             ]);
         } catch (\Throwable $th) {
             return response()->json(['error' => $th->getMessage()], 500);
