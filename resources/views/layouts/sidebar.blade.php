@@ -238,24 +238,6 @@
       getSidebarStatusCount()
     });
 
-    const getSidebarStatusCount = () => {
-      $.ajax({
-        url: "{{ route('sidebarStatusCount') }}",
-        type: "GET",
-        dataType: "json",
-        success: function(data) {
-          $("#totalOrders").html(data.totalOrders);
-          $("#totalUnPaidOrders").html(data.totalUnPaidOrders);
-          $("#totalPaidOrders").html(data.totalPaidOrders);
-
-          $("#totalThreads").html(data.totalThreads);
-          $("#totalPendingThreads").html(data.totalPendingThreads);
-          $("#totalPendingReplies").html(data.totalPendingReplies);
-
-          $("#totalNotifications").html(data.totalNotifications);
-          $("#totalPendingNotifications").html(data.totalPendingNotifications);
-        }
-      });
-    }
+   
   </script>
 @endpush

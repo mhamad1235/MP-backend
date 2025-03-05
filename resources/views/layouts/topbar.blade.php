@@ -123,7 +123,7 @@
         <div class="dropdown ms-sm-3 header-item topbar-user">
           <button type="button" class="btn" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="d-flex align-items-center">
-              <img class="rounded-circle header-profile-user" src=" {{ getAvatar(Auth::user()) }}" alt="Header Avatar">
+              <img class="rounded-circle header-profile-user" src="#" alt="Header Avatar">
               <span class="ms-xl-2 text-start">
                 <span class="d-none d-xl-inline-block fw-semibold user-name-text ms-1">{{ Auth::user()->name }}</span>
                 <span class="d-none d-xl-block fs-12 user-name-sub-text ms-1">{{ Auth::user()->roles[0]->name }}</span>
@@ -133,7 +133,7 @@
           <div class="dropdown-menu dropdown-menu-end">
             <!-- item-->
             <h6 class="dropdown-header">Welcome {{ auth()->user()->name }} </h6>
-            <a class="dropdown-item" href="{{ route('profile.index') }}"><i class="mdi mdi-account-circle text-muted fs-16 me-1 align-middle"></i> <span class="align-middle">Profile</span></a>
+            <a class="dropdown-item" href=""><i class="mdi mdi-account-circle text-muted fs-16 me-1 align-middle"></i> <span class="align-middle">Profile</span></a>
             {{-- <a class="dropdown-item" href="auth-lockscreen-basic"><i class="mdi mdi-lock text-muted fs-16 me-1 align-middle"></i> <span class="align-middle">Lock screen</span></a> --}}
             <a class="dropdown-item" href="javascript:void();" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="bx bx-power-off font-size-16 me-1 align-middle"></i> <span key="t-logout">@lang('translation.logout')</span></a>
             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
