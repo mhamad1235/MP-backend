@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Config;
 use App\Models\User;
 use App\Mail\VerifyEmail;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\LoginRequest;
+use Illuminate\Http\Response;
 
 class AuthController extends Controller
 {
@@ -48,5 +50,27 @@ class AuthController extends Controller
             return response()->json(['error' => $th->getMessage()], 500);
         }
     }
+    public function login(LoginRequest $request)
+    {
+        $validated = $request->validated();
+
+        if ($validated["credential_type"] == 'email') {
+            $user = User::where('email', $validated["email_or_phone"])->first();
+        } else {
+            $user = User::where('phone', $validated["email_or_phone"])->first();
+        }
+
+        //check password
+        if (!$user || !Hash::check($validated['password'], $user->password)) {
+            return $this->jsonResponse(false,"Wrong password or email", Response::HTTP_UNAUTHORIZED);
+        }
+
+        //create token and attach to user
+        $token =  $user->createToken('auth_token')->plainTextToken;
+        $user["user_token"] = $token;
+
+        return $this->jsonResponse(true,"successful", Response::HTTP_OK, $user);
+    }
+
 }
 

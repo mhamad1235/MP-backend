@@ -10,13 +10,13 @@ use App\Models\Sso;
 class SocialAuthController extends Controller
 {
     public function redirectToProvider($provider)
-    {     try {
-        $url = Socialite::driver($provider)->stateless()->redirect()->getTargetUrl();
-        dd($url);
-        return redirect($url);
-    } catch (\Throwable $th) {
-        dd($th->getMessage());
-    }
+    {
+        try {
+            $url = Socialite::driver($provider)->stateless()->redirect()->getTargetUrl();
+            return response()->json(['url' => $url]);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()], 500);
+        }
     }
 
         public function handleProviderCallback($provider)

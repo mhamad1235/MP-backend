@@ -17,7 +17,7 @@ Route::group(["prefix" => "auth"], function () {
     // Route::post('/send', [TwilioController::class, 'sendOtp']);
     // Route::post('/verify', [TwilioController::class, 'verify']);
     Route::post('/register',[AuthController::class,'register']);
-    Route::post('/login',[LoginController::class,'login'])->name('login');
+    Route::post('/login',[AuthController::class,'login'])->name('login');
 });
 
 Route::post('/email/verification-notification', [EmailVerificationController::class, 'sendVerificationEmail'])
